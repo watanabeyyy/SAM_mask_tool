@@ -8,8 +8,8 @@ from pathlib import Path
 import predictor_auto
 
 #グローバル変数
-mask = None #表示用マスク画像
-sam_image = None #表示用SAM出力画像
+mask: np.ndarray = np.array([0]) #表示用マスク画像
+sam_image: np.ndarray = np.array([0]) #表示用SAM出力画像
 drawing = False
 mode = False
 
@@ -60,7 +60,7 @@ def callback(event, x, y, flags, param):
         else:
             mode = 3
 
-def find_color_indices(image_array, color):
+def find_color_indices(image_array: np.ndarray, color: np.ndarray):
     indices = np.where(np.all(image_array == color, axis=-1))
     return indices
 
@@ -73,60 +73,63 @@ cv2.setMouseCallback('mask', callback)
 cv2.setMouseCallback('image', callback)
 
 # メインループ
-def main(impath: str, device: str) -> None:
+def main(impaths: list, device: str) -> None:
     global mask, sam_image, mode
 
-    # 画像の読み込み
-    org_image = cv2.imread(impath)
-    resize_mag = 800 / np.max(org_image.shape)#長辺のピクセル数を800に変更
-    image = cv2.resize(org_image, (int(org_image.shape[1]*resize_mag), int(org_image.shape[0]*resize_mag)))
-    #SAM推論用にRGBに変更
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    #SAMマスク画像取得
-    print("predicting...")
+    #mask_generatorのロード
     mask_generator = predictor_auto.MaskGenerator(device)
-    sam_image = mask_generator.pred(image)
-    print("finish!")
-    sam_tmp = np.copy(sam_image)
-    #表示用にBGRに戻す
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    #出力マスク画像
-    mask = np.zeros_like(image, np.uint8)
 
-    print("left click: select")
-    print("right click: unselect")
-    print("press s: save mask")
-    print("press r: reset mask")
-    print("press q: quit")
+    for impath in impaths:
+        # 画像の読み込み
+        org_image = cv2.imread(impath)
+        resize_mag = 800 / np.max(org_image.shape)#長辺のピクセル数を800に変更
+        image = cv2.resize(org_image, (int(org_image.shape[1]*resize_mag), int(org_image.shape[0]*resize_mag)))
+        #SAM推論用にRGBに変更
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        #SAMマスク画像取得
+        print("predicting...")
+        sam_image = mask_generator.pred(image)
+        print("finish!")
+        sam_tmp = np.copy(sam_image)
+        #表示用にBGRに戻す
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        #出力マスク画像
+        mask = np.zeros_like(image, np.uint8)
 
-    while True:
-        cv2.imshow('image', image)
-        cv2.imshow('mask', mask)
-        cv2.imshow('sam_image', sam_image)
+        print("left click: select")
+        print("right click: unselect")
+        print("press s: save mask")
+        print("press r: reset mask")
+        print("press q: quit")
 
-        key = -1
-        key = cv2.waitKey(1)
-        if key & 0xFF == ord('s'):
-            print("save")
-            impath = Path(impath)
-            maskpath = impath.parent.parent/ Path("mask") / (impath.stem + "_mask.jpg")
-            cv2.imwrite(str(maskpath), mask)
-        elif key & 0xFF == ord('r'):
-            print("リセット")
-            sam_image = np.copy(sam_tmp)
-        elif key & 0xFF == ord('q'):
-            print("終了")
-            break
-        elif key & 0xFF == ord('1'):
-            print("選択モード")
-            mode = 0
-        elif key & 0xFF == ord('2'):
-            print("塗り絵モード")
-            mode = 3
+        while True:
+            cv2.imshow('image', image)
+            cv2.imshow('mask', mask)
+            cv2.imshow('sam_image', sam_image)
+
+            key = -1
+            key = cv2.waitKey(1)
+            if key & 0xFF == ord('s'):
+                print("save")
+                maskpath = Path(impath).parent.parent/ "mask" / (Path(impath).stem + "_mask.jpg")
+                cv2.imwrite(str(maskpath), mask)
+            elif key & 0xFF == ord('r'):
+                print("リセット")
+                sam_image = np.copy(sam_tmp)
+            elif key & 0xFF == ord('n'):
+                print("次へ")
+                break
+            elif key & 0xFF == ord('1'):
+                print("選択モード")
+                mode = 0
+            elif key & 0xFF == ord('2'):
+                print("塗り絵モード")
+                mode = 3
 
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    impath = "img/test.png"
+    import glob
+    impaths = glob.glob("img/*.jpg")
     device = "cuda"
-    main(impath, device)
+    main(impaths, device)

@@ -4,7 +4,7 @@ SAM(https://segment-anything.com/)を使ってマスク画像を作成するツ�
 # 事前準備
 - https://github.com/facebookresearch/segment-anything からViT-H SAM modelをダウンロードしてフォルダ直下に保存
 - segment-anythingの実行環境を構築
-- gui_auto.pyファイルのimpathに入力画像へのパスを設定してください。
+- gui_auto.pyファイルのimpathsに入力画像へのパスを設定してください。
 - gui_auto.pyファイルのdeviceに使用するデバイスをしてしてください。（GPUがなければ"cpu"に変更）
 
 # 使い方
@@ -23,6 +23,6 @@ python gui_auto.py
 - 右クリック：クリックした領域をマスクから消す
 - sキー：マスク画像をmaskフォルダに保存
 - rキー：マスク画像を初期化
-- qキー：終了
+- nキー：次の画像へ
 - 1キー：領域選択モード
 - 2キー：塗り絵モード
