@@ -100,7 +100,7 @@ def main(impaths: list, device: str) -> None:
         print("right click: unselect")
         print("press s: save mask")
         print("press r: reset mask")
-        print("press q: quit")
+        print("press n: next")
 
         while True:
             cv2.imshow('image', image)
