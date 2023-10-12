@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from pathlib import Path
 import predictor_auto
+import os
 
 # グローバル変数
 mask: np.ndarray = np.array([0])  # 表示用マスク画像
@@ -24,6 +25,23 @@ def print_help():
     print("1キー：領域選択モードへ")
     print("2キー：塗り絵モードへ")
     print("=======================")
+
+
+def imwrite(filename, img, params=None):
+    # 日本語対応版imwrite
+    try:
+        ext = os.path.splitext(filename)[1]
+        result, n = cv2.imencode(ext, img, params)
+
+        if result:
+            with open(filename, mode='w+b') as f:
+                n.tofile(f)
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        return False
 
 
 def draw(mask: np.ndarray, sam_image: np.ndarray, x: int, y: int, mode: int):
@@ -129,7 +147,7 @@ def main(impaths: list, device: str) -> None:
                 print("save")
                 maskpath = Path(impath).parent.parent / "mask" / \
                     (Path(impath).stem + "_mask.jpg")
-                cv2.imwrite(str(maskpath), mask)
+                imwrite(str(maskpath), mask)
             elif key & 0xFF == ord('r'):
                 print("リセット")
                 sam_image = np.copy(sam_tmp)
