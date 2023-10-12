@@ -44,6 +44,16 @@ def imwrite(filename, img, params=None):
         return False
 
 
+def imread(filename: str, flags: int = cv2.IMREAD_COLOR, dtype=np.uint8):
+    try:
+        n = np.fromfile(filename, dtype)
+        img = cv2.imdecode(n, flags)
+        return img
+    except Exception as e:
+        print(e)
+        return None
+
+
 def draw(mask: np.ndarray, sam_image: np.ndarray, x: int, y: int, mode: int):
     color = sam_image[y, x]
     if mode == 1:  # select
@@ -107,10 +117,9 @@ cv2.setMouseCallback('sam_image', callback)
 cv2.setMouseCallback('mask', callback)
 cv2.setMouseCallback('image', callback)
 
-# メインループ
-
 
 def main(impaths: list, device: str) -> None:
+    # メインループ
     global mask, sam_image, mode
 
     # mask_generatorのロード
@@ -118,7 +127,7 @@ def main(impaths: list, device: str) -> None:
 
     for impath in impaths:
         # 画像の読み込み
-        org_image = cv2.imread(impath)
+        org_image = imread(impath)
         resize_mag = 800 / np.max(org_image.shape)  # 長辺のピクセル数を800に変更
         image = cv2.resize(org_image, (int(
             org_image.shape[1]*resize_mag), int(org_image.shape[0]*resize_mag)))
