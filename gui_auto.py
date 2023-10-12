@@ -14,6 +14,18 @@ drawing = False
 mode = False
 
 
+def print_help():
+    print("===操作方法==============")
+    print("左クリック：塗る")
+    print("右クリック：消す")
+    print("sキー：保存し次へ")
+    print("rキー：リセット")
+    print("nキー：スキップし次へ")
+    print("1キー：領域選択モードへ")
+    print("2キー：塗り絵モードへ")
+    print("=======================")
+
+
 def draw(mask: np.ndarray, sam_image: np.ndarray, x: int, y: int, mode: int):
     color = sam_image[y, x]
     if mode == 1:  # select
@@ -104,11 +116,7 @@ def main(impaths: list, device: str) -> None:
         # 出力マスク画像
         mask = np.zeros_like(image, np.uint8)
 
-        print("left click: select")
-        print("right click: unselect")
-        print("press s: save mask")
-        print("press r: reset mask")
-        print("press n: next")
+        print_help()
 
         while True:
             cv2.imshow('image', image)
