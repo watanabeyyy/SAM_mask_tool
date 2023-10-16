@@ -157,6 +157,7 @@ def main(impaths: list, device: str) -> None:
                 maskpath = Path(impath).parent.parent / "mask" / \
                     (Path(impath).stem + "_mask.jpg")
                 imwrite(str(maskpath), mask)
+                break
             elif key & 0xFF == ord('r'):
                 print("リセット")
                 sam_image = np.copy(sam_tmp)
