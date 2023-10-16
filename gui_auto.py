@@ -137,7 +137,6 @@ def main(impaths: list, device: str) -> None:
         print("predicting...")
         sam_image = mask_generator.pred(image)
         print("finish!")
-        sam_tmp = np.copy(sam_image)
         # 表示用にBGRに戻す
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         # 出力マスク画像
@@ -160,7 +159,7 @@ def main(impaths: list, device: str) -> None:
                 break
             elif key & 0xFF == ord('r'):
                 print("リセット")
-                sam_image = np.copy(sam_tmp)
+                mask = np.zeros_like(image, np.uint8)
             elif key & 0xFF == ord('n'):
                 print("次へ")
                 break
