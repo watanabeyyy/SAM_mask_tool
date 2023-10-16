@@ -176,6 +176,6 @@ def main(impaths: list, device: str) -> None:
 if __name__ == '__main__':
     import glob
     impaths = glob.glob("img/*.jpg")
-    device = "cpu"
-    # device = "cuda"
+    device = "cuda"
+    # device = "cpu"
     main(impaths, device)
